@@ -9,8 +9,15 @@ interface SearchBarProps {
 export default function SearchBar({ onSubmit }: SearchBarProps) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const form = e.currentTarget;
-    const input = form.elements.namedItem('query') as HTMLInputElement;
+    const input = form.elements.namedItem('query') as HTMLInputElement | null;
+
+    if (!input) {
+      toast.error('Search input not found.');
+      return;
+    }
+
     const value = input.value.trim();
 
     if (!value) {
@@ -19,7 +26,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
     }
 
     onSubmit(value);
-    form.reset();
+    form.reset(); // автоматичне очищення поля
   };
 
   return (
@@ -33,13 +40,14 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         >
           Powered by TMDB
         </a>
+
         <form className={styles.form} onSubmit={handleSubmit}>
           <input
             className={styles.input}
             type="text"
             name="query"
-            autoComplete="off"
             placeholder="Search movies..."
+            autoComplete="off"
             autoFocus
           />
           <button className={styles.button} type="submit">
